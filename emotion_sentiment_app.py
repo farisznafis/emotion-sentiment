@@ -12,6 +12,7 @@ import pandas as pd
 def load_model():
     return tf.keras.models.load_model('model/model_24112024_400.h5')
 
+@st.cache_data
 def preprocess_audio(path):
     _, sr = librosa.load(path, sr=None)  # Ensure loading with the original sample rate
     raw_audio = AudioSegment.from_file(path)
@@ -94,7 +95,7 @@ if uploaded_file is not None:
         # Load model and make prediction
         st.write(f"Feature shape: {features.shape}")
         model = load_model()
-        prediction = model.predict(features)
+        prediction = model.predict(features, batch_size=1)
         st.write(f"Prediction shape: {prediction.shape}")
         predicted_class = np.argmax(prediction[0])
         emotion = get_emotion_label(predicted_class)
