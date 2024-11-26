@@ -5,6 +5,7 @@ from pydub import AudioSegment
 import tensorflow as tf
 import tempfile
 import os
+import pandas as pd
 
 # Load the model
 @st.cache_resource
@@ -107,8 +108,14 @@ if uploaded_file is not None:
         # Display confidence scores
         st.write("### Confidence Scores")
         emotion_names = ['Neutral', 'Happy', 'Sad', 'Angry', 'Fear', 'Disgust']
-        for emotion_name, conf in zip(emotion_names, prediction[0]):
-            st.write(f"{emotion_name}: {conf:.2%}")
+        confidence_scores = prediction[0]
+        
+        # Create DataFrame for visualization
+        data = pd.DataFrame({
+            'Emotion': emotion_names,
+            'Confidence': confidence_scores
+        })
+        st.bar_chart(data.set_index('Emotion'))  # Plot the bar chart
         
         # Cleanup
         os.unlink(temp_path)
