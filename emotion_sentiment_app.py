@@ -10,7 +10,7 @@ import pandas as pd
 # Load the model
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model('model_24112024_400.h5')
+    return tf.keras.models.load_model('model/model_24112024_400.h5')
 
 def preprocess_audio(path):
     _, sr = librosa.load(path, sr=None)  # Ensure loading with the original sample rate
