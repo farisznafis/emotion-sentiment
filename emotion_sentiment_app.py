@@ -6,6 +6,7 @@ import tensorflow as tf
 import tempfile
 import os
 import pandas as pd
+import ffmpeg
 
 # Load the model
 @st.cache_resource
