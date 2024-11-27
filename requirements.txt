@@ -9,6 +9,6 @@ pydub
 streamlit
 python-ffmpeg
 ffmpeg
-simpleaudio
+# simpleaudio
 # libsndfile
 # ffprobe
