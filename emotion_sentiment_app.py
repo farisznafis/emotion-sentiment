@@ -68,7 +68,7 @@ st.title("Audio Emotion Analysis")
 st.write("Upload an audio file to analyze its emotional content")
 
 # File uploader
-uploaded_file = st.file_uploader("Choose an audio file", type=['wav', 'mp3', 'ogg'])
+uploaded_file = st.file_uploader("Choose an audio file", type=['wav', 'mp3', 'ogg', 'aac', 'flac', 'amr', 'm4a'])
 
 if uploaded_file is not None:
     try:
