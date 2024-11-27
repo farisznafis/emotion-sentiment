@@ -10,8 +10,8 @@ import pandas as pd
 # import ffprobe
 
 # ignore warnings
-import warnings
-warnings.filterwarnings('ignore')
+# import warnings
+# warnings.filterwarnings('ignore')
 
 # Load the model
 @st.cache_resource
