@@ -80,7 +80,7 @@ if uploaded_file is not None:
         progress_bar = st.progress(0)
         status_text = st.empty()
 
-        st.audio(uploaded_file, format='audio/ogg', start_time=0)
+        st.audio(uploaded_file, format='audio/wav', start_time=0)
         
         # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1]) as tmp_file:
