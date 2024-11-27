@@ -8,5 +8,5 @@ tensorflow==2.17.0
 pydub
 streamlit
 python-ffmpeg
-libsndfile
+# libsndfile
 # ffprobe
