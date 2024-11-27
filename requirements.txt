@@ -7,5 +7,5 @@ scikit-learn==1.4.1.post1
 tensorflow==2.17.0
 pydub
 streamlit
-ffmpeg
+python-ffmpeg
 # ffprobe
