@@ -9,6 +9,10 @@ import pandas as pd
 # import ffmpeg
 # import ffprobe
 
+# ignore warnings
+import warnings
+warnings.filterwarnings('ignore')
+
 # Load the model
 @st.cache_resource
 def load_model():
