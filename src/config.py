@@ -4,14 +4,6 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 
 MODEL_PATH = ROOT_DIR / "model" / "emotion_model.keras"
 
-# Historical preprocessing contract used by the trained checkpoint.
-#
-# The reference training notebook calculated MFCC features using
-# librosa's default 22,050 Hz sample rate while the PCM samples were
-# obtained through pydub. Keep this value stable unless the model is
-# retrained and revalidated.
-# FEATURE_SAMPLE_RATE = 22_050
-
 # Audio preprocessing
 TARGET_SAMPLES = 180_000
 TRIM_TOP_DB = 25

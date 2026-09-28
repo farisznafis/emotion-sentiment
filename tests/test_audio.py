@@ -8,7 +8,7 @@ from src.audio import (
     validate_audio_upload,
 )
 from src.config import (
-    FEATURE_SAMPLE_RATE,
+    # FEATURE_SAMPLE_RATE,
     MAX_UPLOAD_SIZE_MB,
     TARGET_SAMPLES,
 )

@@ -3,10 +3,11 @@ import numpy as np
 from src.config import (
     EXPECTED_FRAME_COUNT,
     FEATURE_COUNT,
-    FEATURE_SAMPLE_RATE,
     TARGET_SAMPLES,
 )
 from src.features import extract_features
+
+TEST_SAMPLE_RATE = 22_050
 
 
 def _make_test_audio() -> np.ndarray:
@@ -24,7 +25,7 @@ def _make_test_audio() -> np.ndarray:
 def test_extract_features_returns_expected_shape():
     features = extract_features(
         _make_test_audio(),
-        FEATURE_SAMPLE_RATE,
+        TEST_SAMPLE_RATE,
     )
 
     assert features.shape == (
@@ -37,7 +38,7 @@ def test_extract_features_returns_expected_shape():
 def test_extract_features_are_finite():
     features = extract_features(
         _make_test_audio(),
-        FEATURE_SAMPLE_RATE,
+        TEST_SAMPLE_RATE,
     )
 
     assert np.all(
