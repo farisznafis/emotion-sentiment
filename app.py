@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 import pandas as pd
@@ -8,10 +9,29 @@ from src.audio import (
     temporary_audio_file,
     validate_audio_upload,
 )
-from src.config import MAX_UPLOAD_SIZE_MB
+from src.config import (
+    SUPPORTED_EXTENSIONS,
+)
 from src.predictor import (
     PredictionError,
     predict_audio,
+)
+from src.schemas import PredictionResult
+
+logger = logging.getLogger(__name__)
+
+UPLOAD_TYPES = [
+    extension.lstrip(".")
+    for extension in sorted(
+        SUPPORTED_EXTENSIONS
+    )
+]
+
+SUPPORTED_FORMATS = ", ".join(
+    extension.lstrip(".").upper()
+    for extension in sorted(
+        SUPPORTED_EXTENSIONS
+    )
 )
 
 
@@ -23,7 +43,9 @@ st.set_page_config(
 
 
 def render_header() -> None:
-    st.title("Voice Emotion Recognition")
+    st.title(
+        "Voice Emotion Recognition"
+    )
 
     st.write(
         """
@@ -33,14 +55,20 @@ def render_header() -> None:
     )
 
     st.caption(
-        "Supports WAV, MP3, M4A, FLAC, OGG, AAC and AMR."
+        f"Supported formats: {SUPPORTED_FORMATS}."
     )
 
 
-def render_prediction(result) -> None:
-    st.success("Analysis complete")
+def render_prediction(
+    result: PredictionResult,
+) -> None:
+    st.success(
+        "Analysis complete"
+    )
 
-    emotion_column, confidence_column = st.columns(2)
+    emotion_column, confidence_column = (
+        st.columns(2)
+    )
 
     with emotion_column:
         st.metric(
@@ -56,42 +84,52 @@ def render_prediction(result) -> None:
 
     st.progress(
         min(
-            max(result.confidence, 0.0),
+            max(
+                result.confidence,
+                0.0,
+            ),
             1.0,
         )
     )
 
-    st.subheader("Confidence by emotion")
+    st.subheader(
+        "Confidence by emotion"
+    )
 
     dataframe = pd.DataFrame(
         {
             "Emotion": [
                 emotion.title()
-                for emotion in result.scores
+                for emotion
+                in result.scores
             ],
-            "Confidence": [
-                score
-                for score in result.scores.values()
-            ],
+            "Confidence": list(
+                result.scores.values()
+            ),
         }
     )
 
     dataframe["Confidence (%)"] = (
-        dataframe["Confidence"] * 100
+        dataframe["Confidence"]
+        * 100
     )
 
-    dataframe = dataframe.sort_values(
-        "Confidence",
-        ascending=False,
+    dataframe = (
+        dataframe.sort_values(
+            "Confidence",
+            ascending=False,
+        )
     )
 
     st.bar_chart(
-        dataframe.set_index("Emotion")[
-            "Confidence"
-        ]
+        dataframe.set_index(
+            "Emotion"
+        )["Confidence"]
     )
 
-    with st.expander("View detailed scores"):
+    with st.expander(
+        "View detailed scores"
+    ):
         st.dataframe(
             dataframe[
                 [
@@ -109,31 +147,28 @@ def main() -> None:
 
     st.divider()
 
-    uploaded_file = st.file_uploader(
-        "Upload a speech recording",
-        type=[
-            "wav",
-            "mp3",
-            "ogg",
-            "aac",
-            "flac",
-            "amr",
-            "m4a",
-        ],
-        help=(
-            "For better results, use clear speech "
-            "with minimal background noise."
-        ),
+    uploaded_file = (
+        st.file_uploader(
+            "Upload a speech recording",
+            type=UPLOAD_TYPES,
+            help=(
+                "For better results, use clear speech "
+                "with minimal background noise."
+            ),
+        )
     )
 
     if uploaded_file is None:
         st.info(
-            "Upload an audio recording to start the analysis."
+            "Upload an audio recording "
+            "to start the analysis."
         )
 
         return
 
-    audio_bytes = uploaded_file.getvalue()
+    audio_bytes = (
+        uploaded_file.getvalue()
+    )
 
     try:
         validate_audio_upload(
@@ -143,7 +178,6 @@ def main() -> None:
 
     except AudioProcessingError as exc:
         st.error(str(exc))
-
         return
 
     st.audio(audio_bytes)
@@ -185,13 +219,16 @@ def main() -> None:
         PredictionError,
     ) as exc:
         st.error(str(exc))
-
         return
 
     except Exception:
+        logger.exception(
+            "Unexpected application error."
+        )
+
         st.error(
-            "An unexpected error occurred while "
-            "processing the audio."
+            "An unexpected error occurred "
+            "while processing the audio."
         )
 
         return

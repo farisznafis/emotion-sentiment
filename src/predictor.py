@@ -1,17 +1,70 @@
+import logging
 from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
 
-from src.audio import preprocess_audio
-from src.config import EMOTION_LABELS, MODEL_PATH
+from src.audio import (
+    AudioProcessingError,
+    preprocess_audio,
+)
+from src.config import (
+    EMOTION_LABELS,
+    EXPECTED_FRAME_COUNT,
+    FEATURE_COUNT,
+    MODEL_PATH,
+)
 from src.features import extract_features
 from src.schemas import PredictionResult
+
+logger = logging.getLogger(__name__)
 
 
 class PredictionError(Exception):
     """Raised when model inference fails."""
+
+
+def _validate_model_contract(
+    model: tf.keras.Model,
+) -> None:
+    expected_input_shape = (
+        None,
+        EXPECTED_FRAME_COUNT,
+        FEATURE_COUNT,
+    )
+
+    actual_input_shape = tuple(
+        model.input_shape
+    )
+
+    if (
+        actual_input_shape
+        != expected_input_shape
+    ):
+        raise ValueError(
+            "Unexpected model input shape: "
+            f"{actual_input_shape}. "
+            f"Expected {expected_input_shape}."
+        )
+
+    expected_output_size = len(
+        EMOTION_LABELS
+    )
+
+    actual_output_size = int(
+        model.output_shape[-1]
+    )
+
+    if (
+        actual_output_size
+        != expected_output_size
+    ):
+        raise ValueError(
+            "Unexpected model output size: "
+            f"{actual_output_size}. "
+            f"Expected {expected_output_size}."
+        )
 
 
 @lru_cache(maxsize=1)
@@ -25,25 +78,30 @@ def load_model(
             f"Model file was not found: {path}"
         )
 
-    return tf.keras.models.load_model(
+    model = tf.keras.models.load_model(
         path,
         compile=False,
     )
+
+    _validate_model_contract(model)
+
+    return model
 
 
 def _to_probabilities(
     output: np.ndarray,
 ) -> np.ndarray:
-    """
-    Preserve existing softmax outputs.
-
-    If the model returns logits instead, convert them to probabilities.
-    """
-
     output = np.asarray(
         output,
         dtype=np.float32,
     )
+
+    if not np.all(
+        np.isfinite(output)
+    ):
+        raise ValueError(
+            "Model output contains invalid numeric values."
+        )
 
     if (
         np.all(output >= 0)
@@ -59,14 +117,19 @@ def _to_probabilities(
 
     exp_values = np.exp(shifted)
 
-    return exp_values / np.sum(exp_values)
+    return (
+        exp_values
+        / np.sum(exp_values)
+    )
 
 
 def predict_audio(
     path: str,
 ) -> PredictionResult:
     try:
-        audio, sample_rate = preprocess_audio(path)
+        audio, sample_rate = (
+            preprocess_audio(path)
+        )
 
         features = extract_features(
             audio,
@@ -81,20 +144,36 @@ def predict_audio(
             verbose=0,
         )
 
+    except AudioProcessingError:
+        raise
+
     except Exception as exc:
-        raise PredictionError(
+        logger.exception(
             "Emotion prediction failed."
+        )
+
+        raise PredictionError(
+            "Emotion prediction failed. "
+            "Please try another recording."
         ) from exc
 
-    output = np.asarray(prediction)[0]
+    output = np.asarray(
+        prediction,
+        dtype=np.float32,
+    )[0]
 
-    if len(output) != len(EMOTION_LABELS):
+    if (
+        output.size
+        != len(EMOTION_LABELS)
+    ):
         raise PredictionError(
-            "The model output size does not match "
+            "The model output does not match "
             "the configured emotion labels."
         )
 
-    probabilities = _to_probabilities(output)
+    probabilities = _to_probabilities(
+        output
+    )
 
     predicted_index = int(
         np.argmax(probabilities)
@@ -110,9 +189,15 @@ def predict_audio(
     }
 
     return PredictionResult(
-        emotion=EMOTION_LABELS[predicted_index],
+        emotion=(
+            EMOTION_LABELS[
+                predicted_index
+            ]
+        ),
         confidence=float(
-            probabilities[predicted_index]
+            probabilities[
+                predicted_index
+            ]
         ),
         scores=scores,
     )

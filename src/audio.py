@@ -1,13 +1,15 @@
-from contextlib import contextmanager
-from pathlib import Path
 import os
 import tempfile
+from collections.abc import Iterator
+from contextlib import contextmanager
+from pathlib import Path
 
 import librosa
 import numpy as np
 from pydub import AudioSegment
 
 from src.config import (
+    FEATURE_SAMPLE_RATE,
     MAX_UPLOAD_SIZE_MB,
     SUPPORTED_EXTENSIONS,
     TARGET_SAMPLES,
@@ -24,25 +26,34 @@ def validate_audio_upload(
     file_size: int,
 ) -> None:
     if not filename:
-        raise AudioProcessingError("The uploaded file does not have a filename.")
+        raise AudioProcessingError(
+            "The uploaded file does not have a filename."
+        )
 
     extension = Path(filename).suffix.lower()
 
     if extension not in SUPPORTED_EXTENSIONS:
-        supported = ", ".join(sorted(SUPPORTED_EXTENSIONS))
+        supported = ", ".join(
+            sorted(SUPPORTED_EXTENSIONS)
+        )
+
         raise AudioProcessingError(
             f"Unsupported audio format: {extension}. "
             f"Supported formats: {supported}"
         )
 
     if file_size <= 0:
-        raise AudioProcessingError("The uploaded audio file is empty.")
+        raise AudioProcessingError(
+            "The uploaded audio file is empty."
+        )
 
-    max_size_bytes = MAX_UPLOAD_SIZE_MB * 1024 * 1024
+    max_size_bytes = (
+        MAX_UPLOAD_SIZE_MB * 1024 * 1024
+    )
 
     if file_size > max_size_bytes:
         raise AudioProcessingError(
-            f"Audio file is too large. "
+            "Audio file is too large. "
             f"Maximum allowed size is {MAX_UPLOAD_SIZE_MB} MB."
         )
 
@@ -51,8 +62,8 @@ def validate_audio_upload(
 def temporary_audio_file(
     audio_bytes: bytes,
     suffix: str,
-):
-    temp_path = None
+) -> Iterator[str]:
+    temp_path: str | None = None
 
     try:
         with tempfile.NamedTemporaryFile(
@@ -65,7 +76,10 @@ def temporary_audio_file(
         yield temp_path
 
     finally:
-        if temp_path and os.path.exists(temp_path):
+        if (
+            temp_path
+            and os.path.exists(temp_path)
+        ):
             os.unlink(temp_path)
 
 
@@ -73,13 +87,14 @@ def preprocess_audio(
     path: str,
 ) -> tuple[np.ndarray, int]:
     """
-    Decode and preprocess audio for the existing emotion model.
+    Decode audio and reproduce the preprocessing contract used by
+    the trained speech-emotion checkpoint.
 
-    The current production model expects audio padded/truncated to
-    TARGET_SAMPLES samples.
+    The checkpoint expects exactly TARGET_SAMPLES PCM samples.
 
-    This intentionally preserves the original application's use of
-    raw PCM samples instead of silently changing the model input scale.
+    FEATURE_SAMPLE_RATE is intentionally returned for MFCC extraction
+    because the reference training pipeline used librosa's default
+    22,050 Hz feature sample rate.
     """
 
     try:
@@ -90,12 +105,8 @@ def preprocess_audio(
             "The audio file could not be decoded."
         ) from exc
 
-    # Training datasets are speech/mono.
-    # Convert stereo uploads to mono for predictable inference.
     if audio.channels > 1:
         audio = audio.set_channels(1)
-
-    sample_rate = audio.frame_rate
 
     samples = np.asarray(
         audio.get_array_of_samples(),
@@ -117,14 +128,22 @@ def preprocess_audio(
             "The uploaded audio does not contain enough audible signal."
         )
 
-    if len(trimmed) < TARGET_SAMPLES:
+    if trimmed.size < TARGET_SAMPLES:
         processed = np.pad(
             trimmed,
-            (0, TARGET_SAMPLES - len(trimmed)),
+            (
+                0,
+                TARGET_SAMPLES - trimmed.size,
+            ),
             mode="constant",
         )
 
     else:
-        processed = trimmed[:TARGET_SAMPLES]
+        processed = trimmed[
+            :TARGET_SAMPLES
+        ]
 
-    return processed.astype(np.float32), sample_rate
+    return (
+        processed.astype(np.float32),
+        FEATURE_SAMPLE_RATE,
+    )
