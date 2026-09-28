@@ -104,7 +104,7 @@ def test_preprocess_audio_returns_model_contract(
 
     assert (
         feature_sample_rate
-        == FEATURE_SAMPLE_RATE
+        == source_sample_rate
     )
 
     assert np.all(
