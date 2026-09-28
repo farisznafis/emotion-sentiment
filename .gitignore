@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing / linting
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Temporary audio
+temp_audio.*
+*.tmp
+
+# Local datasets
+dataset/
+datasets/
+
+# Generated dataset indexes
+data_path.csv
+indo_emotion_path.csv
+
+# Training history
+history/
+model_history_*.pkl
+
+# Experimental model formats
+model/*.h5
+model/*.pkl
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+!.env.example
