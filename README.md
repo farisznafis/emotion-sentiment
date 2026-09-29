@@ -401,11 +401,10 @@ model load
 synthetic TensorFlow inference
 ```
 
-This is especially useful because the local Windows environment used
-during the remaster has an enterprise Code Integrity policy that blocks
-some Python native extensions. The application itself is therefore
-validated in Linux CI and Streamlit deployment as well as through code
-tests.
+This also gives the project an OS-independent validation path for
+native Python dependencies: the same inference contract is checked in
+Linux CI and in the Streamlit deployment environment as well as through
+the source-level tests.
 
 ## Supported Audio Formats
 
