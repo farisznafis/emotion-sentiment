@@ -1,243 +1,156 @@
-# Voice Emotion Recognition
+                     
+<h1 align="center" style="font-weight: bold;">Audio Emotion Sentiment 💻</h1>
 
-A speech emotion recognition application that estimates emotional
-characteristics from voice recordings using acoustic feature extraction
-and a TensorFlow LSTM model.
+<!-- <p align="center">
+<a href="#tech">Technologies</a>
+<a href="#started">Getting Started</a>
+<a href="#routes">API Endpoints</a>
+<a href="#colab">Collaborators</a>
+<a href="#contribute">Contribute</a> 
+</p> -->
 
-The application predicts one of six emotion classes:
 
-- Neutral
-- Happy
-- Sad
-- Angry
-- Fear
-- Disgust
+<p align="justify">This project focuses on leveraging Natural Language Processing (NLP) techniques to perform sentiment and emotion analysis on text data. The main goal is to classify textual inputs into 6 categories: Angry, Disgust, Fear, Happy, Neutral, and Sad.
+</p>
 
-## Live Demo
 
-https://YOUR-APP.streamlit.app
+<!-- <p align="center">
+<a href="https://github.com/ShaanCoding">📱 Visit this Project</a>
+</p> -->
 
-## Overview
+<h2>Main Files</h2>
 
-This project explores Speech Emotion Recognition (SER) using acoustic
-features extracted from voice recordings.
+- Jupyter Notebook: [speech-emotion-recognition-90.ipynb](https://github.com/farisznafis/emotion-sentiment/blob/main/speech-emotion-recognition-90.ipynb)
+- Streamlit App: [emotion_sentiment_app.py](https://github.com/farisznafis/emotion-sentiment/blob/main/emotion_sentiment_app.py)
 
-An uploaded audio recording is preprocessed into a fixed-length signal.
-Zero Crossing Rate, RMS Energy, and MFCC features are then extracted and
-passed to a trained TensorFlow model.
+<h2>Dataset</h2>
 
-The Streamlit application provides an interactive interface for running
-inference and inspecting confidence scores for each emotion class.
+1. [CREMA-D](https://www.kaggle.com/datasets/ejlok1/cremad)
+2. [RAVDESS Emotional speech audio](https://www.kaggle.com/uwrfkaggler/ravdess-emotional-speech-audio)
+3. [Surrey Audio-Visual Expressed Emotion (SAVEE)](https://www.kaggle.com/ejlok1/SAVEE-database-download)
+4. [Toronto emotional speech set (TESS)](https://www.kaggle.com/ejlok1/toronto-emotional-speech-set-tess)
 
-## Architecture
 
-```text
-Audio Upload
-     |
-     v
-Audio Validation
-     |
-     v
-Audio Preprocessing
-     |
-     |-- decode audio
-     |-- mono conversion
-     |-- silence trimming
-     |-- padding / truncation
-     |
-     v
-Feature Extraction
-     |
-     |-- Zero Crossing Rate
-     |-- RMS Energy
-     |-- 13 MFCC coefficients
-     |
-     v
-Feature Tensor
-(1, 352, 15)
-     |
-     v
-TensorFlow LSTM Model
-     |
-     v
-6 Emotion Probabilities
-     |
-     v
-Prediction + Confidence Scores
-```
+<h2 id="technologies">💻 Technologies</h2>
 
-## Model Input
+- list of all technologies you used
+- react
+- styled components
+- another example
+ 
+<!-- <h2 id="started">🚀 Getting started</h2>
 
-The deployed checkpoint expects a fixed feature tensor:
+Here you describe how to run your project locally
+ 
+<h3>Prerequisites</h3>
 
-| Property | Value |
-| --- | --- |
-| Audio samples | 180,000 |
-| Feature sample rate | 22,050 Hz |
-| Sequence frames | 352 |
-| Features per frame | 15 |
-| ZCR | 1 |
-| RMS | 1 |
-| MFCC | 13 |
-| Output classes | 6 |
+Here you list all prerequisites necessary for running your project. For example:
 
-The feature sample rate is intentionally kept compatible with the
-historical preprocessing pipeline used by the reference training
-notebook.
+- [NodeJS](https://github.com/)
+- [Git 2](https://github.com)
+ 
+<h3>Cloning</h3>
 
-Changing this preprocessing contract should be accompanied by model
-retraining or validation.
-
-## Tech Stack
-
-- Python 3.12
-- TensorFlow / Keras
-- Librosa
-- NumPy
-- Pandas
-- Pydub
-- SoundFile
-- Streamlit
-- Pytest
-- Ruff
-- GitHub Actions
-
-## Project Structure
-
-```text
-emotion-sentiment/
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-├── .streamlit/
-│   └── config.toml
-├── model/
-│   └── emotion_model.keras
-├── notebooks/
-│   └── training_reference.ipynb
-├── src/
-│   ├── audio.py
-│   ├── config.py
-│   ├── features.py
-│   ├── predictor.py
-│   └── schemas.py
-├── tests/
-│   ├── test_audio.py
-│   ├── test_features.py
-│   ├── test_labels.py
-│   └── test_model.py
-├── app.py
-├── packages.txt
-├── pyproject.toml
-├── requirements-dev.txt
-└── requirements.txt
-```
-
-## Local Setup
-
-### 1. Clone the repository
+How to clone your project
 
 ```bash
-git clone https://github.com/farisznafis/emotion-sentiment.git
-cd emotion-sentiment
-git checkout main-v2
+git clone your-project-url-in-github
 ```
+ 
+<h3>Config .env variables</h2>
 
-### 2. Create a virtual environment
+Use the `.env.example` as reference to create your configuration file `.env` with your AWS Credentials
+
+```yaml
+NODE_AWS_REGION=us-east-1
+NODE_AWS_KEY_ID={YOUR_AWS_KEY_ID}
+NODE_AWS_SECRET={YOUR_AWS_SECRET}
+```
+ 
+<h3>Starting</h3>
+
+How to start your project
 
 ```bash
-python -m venv .venv
+cd project-name
+npm some-command-to-run
+```
+ 
+<h2 id="routes">📍 API Endpoints</h2>
+
+Here you can list the main routes of your API, and what are their expected request bodies.
+​
+| route               | description                                          
+|----------------------|-----------------------------------------------------
+| <kbd>GET /authenticate</kbd>     | retrieves user info see [response details](#get-auth-detail)
+| <kbd>POST /authenticate</kbd>     | authenticate user into the api see [request details](#post-auth-detail)
+
+<h3 id="get-auth-detail">GET /authenticate</h3>
+
+**RESPONSE**
+```json
+{
+  "name": "Fernanda Kipper",
+  "age": 20,
+  "email": "her-email@gmail.com"
+}
 ```
 
-Windows:
+<h3 id="post-auth-detail">POST /authenticate</h3>
 
-```powershell
-.\.venv\Scripts\Activate.ps1
+**REQUEST**
+```json
+{
+  "username": "fernandakipper",
+  "password": "4444444"
+}
 ```
 
-Linux / macOS:
-
-```bash
-source .venv/bin/activate
+**RESPONSE**
+```json
+{
+  "token": "OwoMRHsaQwyAgVoc3OXmL1JhMVUYXGGBbCTK0GBgiYitwQwjf0gVoBmkbuyy0pSi"
+}
 ```
+ 
+<h2 id="colab">🤝 Collaborators</h2>
 
-### 3. Install dependencies
+<p>Special thank you for all people that contributed for this project.</p>
+<table>
+<tr>
 
-```bash
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
+<td align="center">
+<a href="https://github.com/Fernanda-Kipper">
+<img src="https://avatars.githubusercontent.com/u/61896274?v=4" width="100px;" alt="Fernanda Kipper Profile Picture"/><br>
+<sub>
+<b>Fernanda Kipper</b>
+</sub>
+</a>
+</td>
 
-For development:
+<td align="center">
+<a href="https://github.com/ShaanCoding">
+<img src="https://avatars.githubusercontent.com/u/22236218?v=4" width="100px;" alt="Shaan Khan Profile Picture"/><br>
+<sub>
+<b>Shaan Khan</b>
+</sub>
+</a>
+</td>
 
-```bash
-python -m pip install -r requirements-dev.txt
-```
+</tr>
+</table>
+ 
+<h2 id="contribute">📫 Contribute</h2>
 
-FFmpeg is also required for decoding compressed audio formats.
+Here you will explain how other developers can contribute to your project. For example, explaining how can create their branches, which patterns to follow and how to open an pull request
 
-### 4. Run the application
+1. `git clone https://github.com/Fernanda-Kipper/text-editor.git`
+2. `git checkout -b feature/NAME`
+3. Follow commit patterns
+4. Open a Pull Request explaining the problem solved or feature made, if exists, append screenshot of visual modifications and wait for the review!
+ 
+<h3>Documentations that might help</h3>
 
-```bash
-python -m streamlit run app.py
-```
+[📝 How to create a Pull Request](https://www.atlassian.com/br/git/tutorials/making-a-pull-request)
 
-## Development
-
-Run tests:
-
-```bash
-python -m pytest
-```
-
-Run linting:
-
-```bash
-ruff check app.py src tests
-```
-
-Check formatting:
-
-```bash
-ruff format --check app.py src tests
-```
-
-Automatically format the source code:
-
-```bash
-ruff format app.py src tests
-```
-
-## Supported Audio Formats
-
-- WAV
-- MP3
-- M4A
-- FLAC
-- OGG
-- AAC
-- AMR
-
-## Limitations
-
-Speech emotion recognition estimates acoustic patterns associated with
-the model's training labels. Emotion is contextual and cannot be
-reliably determined from vocal characteristics alone.
-
-Predictions may vary depending on recording quality, background noise,
-speaker characteristics, language, microphone, and other factors.
-
-This application is an experimental machine-learning project and is not
-intended for psychological, medical, employment, or behavioral
-assessment.
-
-## Training Reference
-
-The original model-development workflow is preserved in:
-
-```text
-notebooks/training_reference.ipynb
-```
-
-The notebook is retained as a training reference, while production
-inference code is maintained separately under `src/`.
+[💾 Commit pattern](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716) -->
